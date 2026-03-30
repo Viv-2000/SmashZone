@@ -1,6 +1,6 @@
 # SmashZone
 
-SmashZone is a Flask-based booking application built to showcase backend development, API-style routing, database integration, and frontend-backend communication.
+SmashZone is a Flask-based booking application built to showcase backend development, API-style routing, database integration, object-oriented programming and frontend-backend communication.
 
 The project allows users to:
 
@@ -16,11 +16,8 @@ This project was built as part of my Python development portfolio to demonstrate
 
 ## Live App
 
-Hosted app: **[Add Render link here after deployment]**
+Hosted app: **https://smashzone-version-1-1.onrender.com**
 
-Example:
-
-`https://smashzone.onrender.com`
 
 ---
 
@@ -108,4 +105,5 @@ smashzone/
 └── data/
     └── bookings.db
 ```
-The data folder is only created locally, not during deployment, as the database created on deployment is managed by Render
+The data folder is created locally only during local testing as sqlite3 is used.
+It will not be created in production as the database server created on deployment is managed by Render
