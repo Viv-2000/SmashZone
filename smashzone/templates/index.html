@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bookings App</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Bookings App</h1>
+
+    <div class="card">
+      <h2>Add Booking</h2>
+      <form id="booking-form">
+        <label>Name</label>
+        <input type="text" id="name" required>
+
+        <label>Email</label>
+        <input type="email" id="email" required>
+
+        <label>Headcount</label>
+        <input type="number" id="headcount" min="1" max="4" value="1" required>
+
+        <button type="submit">Add Booking</button>
+      </form>
+
+      <div id="create-result" class="message"></div>
+    </div>
+
+    <div class="card">
+      <h2>Search Bookings</h2>
+      <input type="text" id="search_term" placeholder="Search by name or email">
+      <button id="search-btn">Search</button>
+      <button id="show-all-btn">Show All</button>
+
+      <div id="bookings-list"></div>
+    </div>
+
+    <div class="card">
+      <h2>Edit Booking</h2>
+
+      <label>Booking ID</label>
+      <input type="number" id="edit-id" placeholder="Enter booking ID">
+
+      <label>New Name</label>
+      <input type="text" id="edit-name" placeholder="Enter new name">
+
+      <label>New Email</label>
+      <input type="email" id="edit-email" placeholder="Enter new email">
+
+      <label>New Headcount</label>
+      <input type="number" id="edit-headcount" placeholder="Enter new headcount">
+
+      <button id="edit-btn">Update Booking</button>
+
+      <div id="edit-result" class="message"></div>
+    </div>
+
+    <div class="card">
+      <h2>Delete Booking</h2>
+
+      <label>Booking ID</label>
+      <input type="number" id="delete-id" placeholder="Enter booking ID">
+
+      <button id="delete-btn" class="danger">Delete Booking</button>
+
+      <div id="delete-result" class="message"></div>
+    </div>
+  </div>
+
+  <script>
+    const bookingForm = document.getElementById("booking-form");
+    const createResult = document.getElementById("create-result");
+    const bookingsList = document.getElementById("bookings-list");
+    const searchBtn = document.getElementById("search-btn");
+    const showAllBtn = document.getElementById("show-all-btn");
+    const editBtn = document.getElementById("edit-btn");
+    const deleteBtn = document.getElementById("delete-btn");
+
+    async function loadAllBookings() {
+      const response = await fetch("/bookings");
+      const bookings = await response.json();
+      renderBookings(bookings);
+    }
+
+    function renderBookings(bookings) {
+      bookingsList.innerHTML = "";
+
+      if (!bookings.length) {
+        bookingsList.innerHTML = "<p>No bookings found.</p>";
+        return;
+      }
+
+      bookings.forEach(booking => {
+        const item = document.createElement("div");
+        item.className = "booking-item";
+        item.innerHTML = `
+          <p><strong>ID:</strong> ${booking.booking_id}</p>
+          <p><strong>Name:</strong> ${booking.name}</p>
+          <p><strong>Email:</strong> ${booking.email}</p>
+          <p><strong>Headcount:</strong> ${booking.headcount}</p>
+        `;
+        bookingsList.appendChild(item);
+      });
+    }
+
+    bookingForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        headcount: Number(document.getElementById("headcount").value)
+      };
+
+      const response = await fetch("/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        createResult.innerHTML = `<p>Booking created successfully.</p>`;
+        bookingForm.reset();
+        loadAllBookings();
+      } else {
+        createResult.innerHTML = `<p class="error">${result.error}</p>`;
+      }
+    });
+
+    searchBtn.addEventListener("click", async function() {
+      const searchTerm = document.getElementById("search_term").value.trim();
+      
+      if (!searchTerm) {
+        bookingsList.innerHTML = "<p>Please enter a name or email to search.</p>";
+        return;
+      }
+
+      const response = await fetch(`/bookings/${encodeURIComponent(searchTerm)}`);
+      const result = await response.json();
+
+      if (response.ok) {
+        renderBookings(result);
+      } else {
+        bookingsList.innerHTML = `<p class="error">${result.error}</p>`;
+      }
+    });
+
+    showAllBtn.addEventListener("click", loadAllBookings);
+
+    editBtn.addEventListener("click", async function() {
+      const bookingId = document.getElementById("edit-id").value;
+      const name = document.getElementById("edit-name").value.trim();
+      const email = document.getElementById("edit-email").value.trim();
+      const headcount = Number(document.getElementById("edit-headcount").value);
+      const editResult = document.getElementById("edit-result");
+
+      if (!bookingId) {
+        editResult.innerHTML = `<p class="error">Please enter a booking ID.</p>`;
+        return;
+      }
+
+      const data = {};
+
+      if (name) data.name = name;
+      if (email) data.email = email;
+      if (headcount) data.headcount = Number(headcount);
+
+      if (!data.name && !data.email && !data.headcount) {
+        editResult.innerHTML = `<p class="error">Enter a new name or email.</p>`;
+        return;
+      }
+
+      const response = await fetch(`/bookings/${bookingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        editResult.innerHTML = `<p>Booking updated successfully.</p>`;
+        document.getElementById("edit-id").value = "";
+        document.getElementById("edit-name").value = "";
+        document.getElementById("edit-email").value = "";
+        document.getElementById("edit-headcount").value = "";
+        loadAllBookings();
+      } else {
+        editResult.innerHTML = `<p class="error">${result.error}</p>`;
+      }
+    });
+
+    deleteBtn.addEventListener("click", async function() {
+      const bookingId = document.getElementById("delete-id").value;
+      const deleteResult = document.getElementById("delete-result");
+
+      if (!bookingId) {
+        deleteResult.innerHTML = `<p class="error">Please enter a booking ID.</p>`;
+        return;
+      }
+
+      const response = await fetch(`/bookings/${bookingId}`, {
+        method: "DELETE"
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        deleteResult.innerHTML = `<p>${result.result}</p>`;
+        document.getElementById("delete-id").value = "";
+        loadAllBookings();
+      } else {
+        deleteResult.innerHTML = `<p class="error">${result.result || result.error}</p>`;
+      }
+    });
+
+    loadAllBookings();
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+1.  Always set root directory of your project
+
+2.  Always have requirements.txt file containing all libraries needed for succcessful deployment like:
+        - gunicorn
+        - flask
+    Do not include the built in libraries such as 'os' 
+
+3.  Always remember to set environment variables if using multiple services simultaneusly in link with each other
+
+4.  Always set start commands that run at deployment
+
+5.  Use gunicorn for running the app at deployment instead of flask becasue:
+        - Flask deployment server is:
+            - single threaded
+            - not secure 
+            - not scalable
+
+6.  Use PostgreSQL (postgres) server for database management at deployment
+
+7.  Remember to make all necessary changes into the production repo after changing development repo
+
+8. Create a new data base service and copy the internal database url to make new env variable
+
+
+
