@@ -1,13 +1,18 @@
-1.  Always set root directory of your project
+1.  Always set root directory of your project - smashzone - folder containing app.py
 
 2.  Always have requirements.txt file containing all libraries needed for succcessful deployment like:
         - gunicorn
         - flask
     Do not include the built in libraries such as 'os' 
 
-3.  Always remember to set environment variables if using multiple services simultaneusly in link with each other
+3.  Always remember to set environment variables if using multiple services simultaneously in link with each other - in this case self.database_url = os.environ.get("DATABASE_URL")
+	- DATABASE_URL is the env variable name the app will look for
+	- eg value postgresql://smashzone_h8_user:3yMdpg-d76u9ug-a/smashzone_h748
 
-4.  Always set start commands that run at deployment
+4.  Always set start commands that run at deployment - gunicorn app:app
+	- first app → your file name (app.py)
+	- second app → your Flask instance (app = Flask(__name__))
+	- gunicorn → production server (not Flask dev server)
 
 5.  Use gunicorn for running the app at deployment instead of flask becasue:
         - Flask deployment server is:
