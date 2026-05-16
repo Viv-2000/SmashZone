@@ -10,7 +10,7 @@ db1.create_table()
 
 app = Flask(__name__)
 
-# root directory
+# root directory abcdefg
 @app.route('/')
 def root():
     return render_template('index.html')
@@ -30,7 +30,7 @@ def show_bookings():
 
 
 
-# find a booking
+# find a cool booking
 @app.route('/bookings/<string:search_term>', methods = ['GET'])
 def find_booking(search_term):
     search_term = search_term.strip()
