@@ -10,7 +10,7 @@ db1.create_table()
 
 app = Flask(__name__)
 
-# root directory
+# root directory abcdefg
 @app.route('/')
 def root():
     return render_template('index.html')
