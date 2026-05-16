@@ -30,7 +30,7 @@ def show_bookings():
 
 
 
-# find a booking
+# find a cool booking
 @app.route('/bookings/<string:search_term>', methods = ['GET'])
 def find_booking(search_term):
     search_term = search_term.strip()
